@@ -23,7 +23,7 @@
 #include <time.h>
 #define HORIZONTAL_CELS 10
 #define VERTICAL_CELS 10
-#define TOTAL_BOMBS 30
+#define TOTAL_BOMBS 50
 
 //enum Cell_posibilities
 //	{
@@ -41,140 +41,164 @@ struct Cell
 
 
 
-//void print_grid_with_mines(struct Cell field[HORIZONTAL_CELS][VERTICAL_CELS])
-//{
-//	printf("   ");   //to align all stuff
-//	for (int n= 0; n < HORIZONTAL_CELS ; n++)      //print all column numbers
-//	{
-//		printf("|%d|", n);
-//	}
-//	printf("\n");
-//	printf("   ");   //to align all stuff
-//	for (int n= 0; n < HORIZONTAL_CELS ; n++)      //print a separating line
-//	{
-//		printf("|-|");
-//	}
-//
-//	for (int i=0; i<VERTICAL_CELS; i++)
-//	{
-//		printf("\n");
-//		printf("%d |", i);
-//		for (int j=0; j< HORIZONTAL_CELS ; j++)
-//		{
-//			printf("|%c|", field[i][j].actual_value);
-//		}
-//	}
-//	printf("\n");
-//	printf("printed");
-//	printf("\n");
-//	printf("\n");
-//}
-//
-//char check_suroundings(struct Cell field[HORIZONTAL_CELS][VERTICAL_CELS],int x0,int y0 , int bombs_or_zeroes)
-//{
-//	if (bombs_or_zeroes == 1)    //check for bombs
-//	{
-//		int ctr = 0;
-//		for (int i = x0 - 1 ; i < x0 + 2 ; i++)
-//		{
-//			for (int j = y0 - 1 ; j < y0 + 2 ; j++)
-//			{
-//
-//				if (i < 0 || j < 0 || i > (HORIZONTAL_CELS - 1 )|| j > (VERTICAL_CELS - 1))
-//				{
-//					continue;
-//				}
-//				else if (field[i][j].actual_value == 'B')
-//				{
-//					ctr++;
-//				}
-//
-//			}
-//		}
-//		if (ctr == 0)
-//		{
-//			field[x0][y0].vissible_value = '0';
-//			field[x0][y0].actual_value = '0';
-//			return mine_checker(field , x0 , y0);
-//
-//		}
-//		else
-//		{
-//			char return_value = ctr + '0';
-//			field[x0][y0].vissible_value = return_value;
-//			field[x0][y0].actual_value = return_value;
-//			return mine_checker(field , x0 , y0);
-//		}
-//
-//	}
-//	else
-//	{
-//		for (int i = x0 - 1 ; i < x0 + 2 ; i++)
-//		{
-//			for (int j = y0 - 1 ; j < y0 + 2 ; j++)
-//			{
-//				if (i == x0 && j == y0)
-//				{
-//					continue;
-//				}
-//				else if (i < 0 || j < 0 || i > HORIZONTAL_CELS || j > VERTICAL_CELS)
-//				{
-//					continue;
-//				}
-//				else if (field[i][j].actual_value == '0' || field[i][j].actual_value == 'B')
-//				{
-//					continue;
-//				}
-//				else
-//				{
-//					printf("\n hier \n");
-//					check_suroundings(field , i , j , 1);
-//				}
-//			}
-//		}
-//	}
-//}
-//
-//void mine_checker(struct Cell field[HORIZONTAL_CELS][VERTICAL_CELS], int move_x, int move_y)
-//{
-//	if (field[move_x][move_y].actual_value == '0' || field[move_x][move_y].actual_value == 'q')
-//	{
-//		check_suroundings(field , move_x , move_y , 0);
-//	}
-//}
-//
-//void update_field(struct Cell field[HORIZONTAL_CELS][VERTICAL_CELS], int move_x, int move_y)
-//{
-//	if (field[move_x][move_y].actual_value == 'B')
-//	{
-//		printf("you lost loser, make the loop complete");
-//	}
-//	else
-//	{
-//		mine_checker(field, move_x , move_y);
-//		printf("\n update_field \n");
-//		print_grid_with_mines(field);
-//		make_move(field);
-//
-//
-//	}
-//}
-//
-//void make_move(struct Cell field[HORIZONTAL_CELS][VERTICAL_CELS])
-//{
-//
-//	int x , y;
-//	printf("\n choose an x coordinate \n");
-//	scanf("%d"  , &x);
-//	printf("\n choose an y coordinate \n");
-//	scanf("%d"  , &y);
-//	update_field(field , x , y);
-//}
-//
+
+
+void check_suroundings(struct Cell *ptr_field ,int x0,int y0 , int bombs_or_zeroes)
+{
+	int offset_bytes;
+	offset_bytes = (x0 + (y0 * VERTICAL_CELS)) * sizeof(struct Cell);
+	if (bombs_or_zeroes == 1)    //check for bombs
+	{
+		int ctr = 0;
+		for (int i = x0 - 1 ; i < x0 + 2 ; i++)
+		{
+			for (int j = y0 - 1 ; j < y0 + 2 ; j++)
+			{
+				offset_bytes = (i + (j * VERTICAL_CELS)) * sizeof(struct Cell);     //zoekt de juiste buren op volgens de opbouw van de getekende matrix
+
+				if (i < 0 || j < 0 || i > (HORIZONTAL_CELS - 1 )|| j > (VERTICAL_CELS - 1))
+				{
+					continue;
+				}
+				else if (*(ptr_field + offset_bytes)->actual_value == 'B')
+				{
+					ctr++;
+				}
+
+			}
+		}
+		offset_bytes = (x0 + (y0 * VERTICAL_CELS)) * sizeof(struct Cell);
+		if (ctr == 0)
+		{
+			printf("\n|%c|" , *(ptr_field + offset_bytes)->vissible_value);
+			*(ptr_field + offset_bytes)->vissible_value = '0';
+			printf("\n|%c|" , *(ptr_field + offset_bytes)->vissible_value);
+			return mine_checker(ptr_field , x0 , y0);
+
+		}
+		else
+		{
+			printf("\n|%c|" , *(ptr_field + offset_bytes)->vissible_value);
+			char return_value = ctr + '0';
+			*(ptr_field + offset_bytes)->vissible_value = return_value;
+			*(ptr_field + offset_bytes)->actual_value = return_value;
+			printf("\n|%c|" , *(ptr_field + offset_bytes)->vissible_value);
+			return mine_checker(ptr_field , x0 , y0);
+		}
+
+	}
+	else
+	{
+		for (int i = x0 - 1 ; i < x0 + 2 ; i++)
+		{
+			for (int j = y0 - 1 ; j < y0 + 2 ; j++)
+			{
+				offset_bytes = (j + (i * VERTICAL_CELS)) * sizeof(struct Cell);
+				if (i == x0 && j == y0 && (!(*(ptr_field + offset_bytes)->vissible_value == 'q') || (*(ptr_field + offset_bytes)->vissible_value == '0')))
+				{
+					*(ptr_field + offset_bytes)->actual_value = 'C';
+				}
+				else if (i < 0 || j < 0 || i > HORIZONTAL_CELS || j > VERTICAL_CELS)
+				{
+					continue;
+				}
+
+				else if (i == x0 && j == y0 && *(ptr_field + offset_bytes)->vissible_value == 'q')
+				{
+					printf("\n en wat is da hier %c", *(ptr_field + offset_bytes)->actual_value);
+					printf("\n hier %d %d\n", i , j);
+					check_suroundings(ptr_field , i , j , 1);
+				}
+				else
+				{
+					printf("\n seg charel %c", *(ptr_field + offset_bytes)->actual_value);
+					printf("\n hier %d %d\n", i , j);
+					check_suroundings(ptr_field , i , j , 1);
+				}
+			}
+		}
+	}
+}
+
+void mine_checker(struct Cell *ptr_field , int move_x, int move_y)
+{
+	int offset_bytes;
+	offset_bytes = (move_x + (move_y * VERTICAL_CELS)) * sizeof(struct Cell);
+	if ((*(ptr_field + offset_bytes)->vissible_value == '0' || *(ptr_field + offset_bytes)->vissible_value == 'q')  && !(*(ptr_field + offset_bytes)->actual_value == 'C'))
+	{
+		check_suroundings(ptr_field , move_x , move_y , 0);
+	}
+}
+
+void update_field(struct Cell *ptr_field, int move_x, int move_y)
+{
+	int offset_bytes;
+	offset_bytes = (move_x + (move_y * VERTICAL_CELS)) * sizeof(struct Cell);
+	printf("\n this is this value loser %c \n" ,*(ptr_field + offset_bytes)->actual_value);
+	if (*(ptr_field + offset_bytes)->actual_value == 'B')
+	{
+		printf("you lost loser, make the loop complete");
+	}
+	else
+	{
+		mine_checker(ptr_field, move_x , move_y);
+		printf("\n update_field \n");
+		print_grid_with_mines(ptr_field);
+		make_move(ptr_field);
+
+
+	}
+}
+
+void make_move(struct Cell *ptr_field)
+{
+
+	int x , y;
+	printf("\n choose an x coordinate \n");
+	scanf("%d"  , &x);
+	printf("\n choose an y coordinate \n");
+	scanf("%d"  , &y);
+	update_field(ptr_field , x , y);
+}
+
+void print_grid_with_mines(struct Cell *ptr_field)
+{
+	int offset_bytes;
+	printf("   ");   //to align all stuff
+	for (int n= 0; n < HORIZONTAL_CELS ; n++)      //print all column numbers
+	{
+		printf("|%d|", n);
+	}
+	printf("\n");
+	printf("   ");   //to align all stuff
+	for (int n= 0; n < HORIZONTAL_CELS ; n++)      //print a separating line
+	{
+		printf("|-|");
+	}
+
+	for (int i=0; i<VERTICAL_CELS; i++)
+	{
+		printf("\n");
+		printf("%d |", i);
+		for (int j=0; j< HORIZONTAL_CELS ; j++)
+		{
+			offset_bytes = (j + (i * VERTICAL_CELS)) * sizeof(struct Cell);
+			printf ("|%c|" , *(ptr_field + offset_bytes)->actual_value);
+		}
+	}
+	printf("\n");
+	printf("printed");
+	printf("\n");
+	printf("\n");
+}
+
  void place_mines(int first_move_x, int first_move_y, struct Cell *ptr_field)
 {
 	int i = 0;
 	int offset_bytes;
+	offset_bytes = (first_move_x + (first_move_y * VERTICAL_CELS)) * sizeof(struct Cell);
+	*(ptr_field + offset_bytes)->vissible_value = '0';
+	*(ptr_field + offset_bytes)->actual_value = '0';
 	while (i != TOTAL_BOMBS)
 	{
 		int random_x = rand() % (HORIZONTAL_CELS);
@@ -205,8 +229,11 @@ struct Cell
 
 
 	}
+	update_field(ptr_field , first_move_x , first_move_y);
+
 
 }
+
 void  make_start_grid(int rows, int columns,struct Cell *ptr_field)
 {
 	printf("   ");   //to align all stuff
@@ -230,9 +257,12 @@ void  make_start_grid(int rows, int columns,struct Cell *ptr_field)
 		{
 			int offset_bytes = (j + (i * VERTICAL_CELS)) * sizeof(struct Cell);
 			*(ptr_field + offset_bytes)->vissible_value = 'q';
+			*(ptr_field + offset_bytes)->actual_value = 'q';
 			printf ("|%c|" , *(ptr_field + offset_bytes)->vissible_value);
 		}
 	}
+	printf("\n");
+	printf("\n");
 
 }
 
@@ -244,20 +274,10 @@ int main(void) {
 //	char y;
 //	char grid[HORIZONTAL_CELS][VERTICAL_CELS];
 	struct Cell field[HORIZONTAL_CELS][VERTICAL_CELS];
-
 	make_start_grid(HORIZONTAL_CELS , VERTICAL_CELS , &field);     //essential for adressing al characters
 	place_mines(2, 2,&field);
-//	printf("\n");
-//	printf("please choose your x starting point(between 1 , 5");
-//	printf("\n");
-//	x = getchar();     //write if to make more robust
-//	int begin_x = x - '0';
-//	printf("\n");
-//	printf("please choose your y starting point(between 1 , 5");
-//	printf("\n");
-//	y = getchar();     //write if to make more robust
-//	y = getchar();     //write if to make more robust
-//	int begin_y = y - '0';
+//	print_grid_with_mines(&field);
+//	make_move(&field);
 
 	return 0;
 }
