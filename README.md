@@ -1,5 +1,5 @@
 # minesweeper
-minesweeper programmed in c
+minesweeper programmed in c using the textfield as visual part
 BUGS:
 *no internal control for choosing elements outside the array
 *printing newlines interfers with action commando's
