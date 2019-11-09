@@ -214,14 +214,11 @@ void make_move(struct Cell *ptr_field)
 			printf("\n write correctly");
 			make_move(ptr_field);
 		}
-
-
 	}
 	else
 	{
 		char action;
-		printf("\n P will show field with bombs, N is for next move and F for a flag\n");
-		printf("\n choose an action type F , P or R\n");
+		printf("\n remaining flags %d \n P will show field with bombs, N is for next move and F for a flag. \n choose an action type F , P or R", TOTAL_BOMBS - el_ctr('F' , ptr_field, 1));
 		scanf("%c", &action);
 		if (action == 'F')
 		{
@@ -300,8 +297,6 @@ void make_move(struct Cell *ptr_field)
 			printf("\n write correctly \n");
 			make_move(ptr_field);
 		}
-
-
 	}
 }
 
@@ -342,9 +337,6 @@ void print_grid(struct Cell *ptr_field , int actual)
 		}
 
 	}
-	printf("\n");
-	printf("printed");
-	printf("\n \n");
 }
 
  void place_mines(int first_move_x, int first_move_y, struct Cell *ptr_field)
@@ -369,12 +361,8 @@ void print_grid(struct Cell *ptr_field , int actual)
 			*(ptr_field + find(random_x , random_y))->vissible_value = 'q';
 			i++;
 		}
-
-
 	}
 	update_field(ptr_field , first_move_x , first_move_y);
-
-
 }
 
 
