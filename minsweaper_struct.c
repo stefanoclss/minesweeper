@@ -31,7 +31,7 @@ struct Cell
 
 };
 
-
+//HULPFUNCTIES
 int find(int move_x ,int move_y)
 {
 	int offset_bytes = (move_x + (move_y * VERTICAL_CELS)) * sizeof(struct Cell);    //hulpfunctie voor het zoeken van een elemnt op de grid
@@ -223,6 +223,7 @@ int el_ctr(char el , struct Cell *ptr_field ,int vis_or_act) //telt het aantal e
 
 void make_move(struct Cell *ptr_field)
 {
+	getchar();
 	if (el_ctr('q' , ptr_field , 0) == 0 || el_ctr('F', ptr_field, 2) == TOTAL_BOMBS)  //loop indien spel gedaan is om verder te spelen
 	{
 		printf("\n you won , wanna play again, write Y/N?");
@@ -413,4 +414,4 @@ int main(void)
 	return 0;                    //belangerijk is dat we gekozen hebben om geen enkele min te plaatsen rond de eerste spot zetten
 }
 //https://stackoverflow.com/questions/40275512/how-to-generate-random-numbers-between-2-values-inclusive   1)line 350,351
-//https://www.geeksforgeeks.org/cpp-implementation-minesweeper-game/    2)showcase of mine searching mechanism line 34
+//https://www.geeksforgeeks.org/cpp-implementation-minesweeper-game/    2)showcase of mine searching mechanism line 40
